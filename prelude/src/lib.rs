@@ -62,52 +62,6 @@ impl Network {
                 .expect("AVALANCHE_NFT_1155_ADDRESS must be set"),
         }
     }
-
-    pub fn reveal_nft_address(&self) -> String {
-        match self {
-            Network::Ethereum => env::var("ETHEREUM_REVEAL_NFT_721_ADDRESS")
-                .expect("ETHEREUM_REVEAL_NFT_721_ADDRESS must be set"),
-            Network::Polygon => unimplemented!(),
-            Network::Avalanche => unimplemented!(),
-        }
-    }
-
-    pub fn sbt_721_address(&self) -> String {
-        match self {
-            Network::Ethereum => {
-                env::var("ETHEREUM_SBT_721_ADDRESS").expect("ETHEREUM_SBT_721_ADDRESS must be set")
-            }
-            Network::Polygon => unimplemented!(),
-            Network::Avalanche => unimplemented!(),
-        }
-    }
-
-    pub fn nft_market_address(&self) -> String {
-        match self {
-            Network::Ethereum => unimplemented!(),
-            Network::Polygon => env::var("POLYGON_NFT_MARKET_ADDRESS")
-                .expect("POLYGON_NFT_MARKET_ADDRESS must be set"),
-            Network::Avalanche => unimplemented!(),
-        }
-    }
-
-    pub fn meta_transaction_wallet_address(&self) -> String {
-        match self {
-            Network::Ethereum => unimplemented!(),
-            Network::Polygon => env::var("POLYGON_META_TRANSACTION_WALLET_ADDRESS")
-                .expect("POLYGON_META_TRANSACTION_WALLET_ADDRESS must be set"),
-            Network::Avalanche => unimplemented!(),
-        }
-    }
-
-    pub fn meta_transactional_nft_721_address(&self) -> String {
-        match self {
-            Network::Ethereum => unimplemented!(),
-            Network::Polygon => env::var("POLYGON_META_TRANSACTIONAL_NFT_721_ADDRESS")
-                .expect("POLYGON_META_TRANSACTIONAL_NFT_721_ADDRESS must be set"),
-            Network::Avalanche => unimplemented!(),
-        }
-    }
 }
 
 #[derive(PartialEq, Clone, Debug, Copy, strum_macros::EnumString, strum_macros::Display)]

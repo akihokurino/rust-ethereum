@@ -11,7 +11,6 @@ ETHER := "0.01"
 TO_ADDRESS := "0x0E91D6613a84d7C8b72a289D8b275AF7717C3d2E"
 TOKEN_ID := "1"
 MESSAGE := "world"
-PACKAGE := "rust-web3"
 CONTRACT := "nft721"
 CONTENT_HASH := "QmPDE4pXnFvNtqJ2889HgEQUEft8KCdyMaKKt5zzw3NuMS"
 
@@ -30,22 +29,19 @@ build-cli:
 balance: build
 	./target/debug/cli \
 	--command balance \
-	--network $(NETWORK) \
-	--package $(PACKAGE)
+	--network $(NETWORK)
 
 send-eth: build
 	./target/debug/cli \
 	--command send-eth \
 	--ether $(ETHER) \
 	--to-address $(TO_ADDRESS) \
-	--network $(NETWORK) \
-	--package $(PACKAGE)
+	--network $(NETWORK)
 
 info: build
 	./target/debug/cli \
 	--command info \
 	--network $(NETWORK) \
-	--package $(PACKAGE) \
 	--contract $(CONTRACT)
 
 create-metadata: build
@@ -61,8 +57,7 @@ mint: build
 	--contract $(CONTRACT) \
 	--network $(NETWORK) \
 	--content-hash $(CONTENT_HASH) \
-	--amount $(AMOUNT) \
-	--package $(PACKAGE)
+	--amount $(AMOUNT)
 
 meta-mint: build
 	./target/debug/cli \
@@ -70,7 +65,6 @@ meta-mint: build
 	--contract meta-transaction-wallet \
 	--network $(NETWORK) \
 	--content-hash $(CONTENT_HASH) \
-	--package $(PACKAGE) \
 	--to-address $(TO_ADDRESS)
 
 transfer: build
@@ -79,15 +73,13 @@ transfer: build
 	--contract $(CONTRACT) \
 	--network $(NETWORK) \
 	--to-address $(TO_ADDRESS) \
-	--token-id $(TOKEN_ID) \
-	--package $(PACKAGE)
+	--token-id $(TOKEN_ID)
 
 deploy: build
 	./target/debug/cli \
 	--command deploy \
 	--contract $(CONTRACT) \
-	--network $(NETWORK) \
-	--package $(PACKAGE)
+	--network $(NETWORK)
 
 extract-abi:
 	cat ethereum/artifacts/contracts/Nft721.sol/Nft721.json | jq '.abi' > impl_rust_web3/src/nft_721/abi.json

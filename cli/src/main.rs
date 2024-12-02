@@ -17,11 +17,6 @@ enum Command {
 }
 
 #[derive(ValueEnum, Clone, Debug)]
-pub enum Package {
-    RustWeb3,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
 pub enum Contract {
     Nft721,
     Nft1155,
@@ -55,10 +50,6 @@ struct Args {
     #[arg(long, default_value = "QmPDE4pXnFvNtqJ2889HgEQUEft8KCdyMaKKt5zzw3NuMS")]
     content_hash: String,
 
-    #[arg(long, default_value = "rust-web3")]
-    #[clap(value_enum)]
-    package: Package,
-
     #[arg(long, default_value = "Polygon")]
     network: String,
 
@@ -90,16 +81,12 @@ async fn execute(args: Args) -> CliResult<()> {
     let network = Network::from_str(&args.network).unwrap();
 
     match args.command {
-        Command::Balance => match args.package {
-            Package::RustWeb3 => impl_rust_web3::get_balance(network)
-                .await
-                .map_err(Error::from),
-        },
-        Command::SendEth => match args.package {
-            Package::RustWeb3 => impl_rust_web3::send_eth(network, args.ether, args.to_address)
-                .await
-                .map_err(Error::from),
-        },
+        Command::Balance => impl_rust_web3::get_balance(network)
+            .await
+            .map_err(Error::from),
+        Command::SendEth => impl_rust_web3::send_eth(network, args.ether, args.to_address)
+            .await
+            .map_err(Error::from),
         Command::CreateMetadata => {
             if !args.image_url.is_empty() {
                 ipfs::create_metadata_from_url(args.name, args.description, args.image_url)
@@ -111,81 +98,73 @@ async fn execute(args: Args) -> CliResult<()> {
                     .map_err(Error::from)
             }
         }
-        Command::Mint => match args.package {
-            Package::RustWeb3 => match args.contract {
-                Contract::Nft721 => {
-                    let cli = impl_rust_web3::nft_721::client::Client::new(network);
-                    cli.mint(args.content_hash.clone())
-                        .await
-                        .map_err(Error::from)
-                }
-                Contract::Nft1155 => {
-                    let cli = impl_rust_web3::nft_1155::client::Client::new(network);
-                    cli.mint(args.content_hash.clone(), args.amount)
-                        .await
-                        .map_err(Error::from)
-                }
-            },
-        },
-        Command::Transfer => match args.package {
-            Package::RustWeb3 => match args.contract {
-                Contract::Nft721 => {
-                    let cli = impl_rust_web3::nft_721::client::Client::new(network);
-                    cli.transfer(
-                        impl_rust_web3::parse_address(args.to_address).unwrap(),
-                        args.token_id,
-                    )
+        Command::Mint => match args.contract {
+            Contract::Nft721 => {
+                let cli = impl_rust_web3::nft_721::client::Client::new(network);
+                cli.mint(args.content_hash.clone())
                     .await
                     .map_err(Error::from)
-                }
-                Contract::Nft1155 => {
-                    let cli = impl_rust_web3::nft_1155::client::Client::new(network);
-                    cli.transfer(
-                        impl_rust_web3::parse_address(args.to_address).unwrap(),
-                        args.token_id,
-                    )
+            }
+            Contract::Nft1155 => {
+                let cli = impl_rust_web3::nft_1155::client::Client::new(network);
+                cli.mint(args.content_hash.clone(), args.amount)
                     .await
                     .map_err(Error::from)
-                }
-            },
+            }
         },
-        Command::Info => match args.package {
-            Package::RustWeb3 => match args.contract {
-                Contract::Nft721 => {
-                    let cli = impl_rust_web3::nft_721::client::Client::new(network);
-                    println!("------------------------------------------------------------");
-                    println!("Nft721 info: {}", network.nft_721_address());
-                    println!("name = {}", cli.name().await?);
-                    println!("latestTokenId = {}", cli.latest_token_id().await?);
-                    println!("totalSupply = {:?}", cli.total_supply().await?);
-                    println!("totalOwned = {:?}", cli.total_owned().await?);
-                    println!("------------------------------------------------------------");
-                    Ok(())
-                }
-                Contract::Nft1155 => {
-                    let cli = impl_rust_web3::nft_1155::client::Client::new(network);
-                    println!("------------------------------------------------------------");
-                    println!("Nft1155 info: {}", network.nft_1155_address());
-                    println!("name = {}", cli.name().await?);
-                    println!("latestTokenId = {}", cli.latest_token_id().await?);
-                    println!("totalSupply = {:?}", cli.total_supply().await?);
-                    println!("totalOwned = {:?}", cli.total_owned().await?);
-                    println!("------------------------------------------------------------");
-                    Ok(())
-                }
-            },
+        Command::Transfer => match args.contract {
+            Contract::Nft721 => {
+                let cli = impl_rust_web3::nft_721::client::Client::new(network);
+                cli.transfer(
+                    impl_rust_web3::parse_address(args.to_address).unwrap(),
+                    args.token_id,
+                )
+                    .await
+                    .map_err(Error::from)
+            }
+            Contract::Nft1155 => {
+                let cli = impl_rust_web3::nft_1155::client::Client::new(network);
+                cli.transfer(
+                    impl_rust_web3::parse_address(args.to_address).unwrap(),
+                    args.token_id,
+                )
+                    .await
+                    .map_err(Error::from)
+            }
         },
-        Command::Deploy => match args.package {
-            Package::RustWeb3 => match args.contract {
-                Contract::Nft721 => {
-                    let cli = impl_rust_web3::nft_721::client::Client::new(network);
-                    cli.deploy().await.map_err(Error::from)
-                }
-                Contract::Nft1155 => {
-                    let cli = impl_rust_web3::nft_1155::client::Client::new(network);
-                    cli.deploy().await.map_err(Error::from)
-                }
-            },
+        Command::Info => match args.contract {
+            Contract::Nft721 => {
+                let cli = impl_rust_web3::nft_721::client::Client::new(network);
+                println!("------------------------------------------------------------");
+                println!("Nft721 info: {}", network.nft_721_address());
+                println!("name = {}", cli.name().await?);
+                println!("latestTokenId = {}", cli.latest_token_id().await?);
+                println!("totalSupply = {:?}", cli.total_supply().await?);
+                println!("totalOwned = {:?}", cli.total_owned().await?);
+                println!("------------------------------------------------------------");
+                Ok(())
+            }
+            Contract::Nft1155 => {
+                let cli = impl_rust_web3::nft_1155::client::Client::new(network);
+                println!("------------------------------------------------------------");
+                println!("Nft1155 info: {}", network.nft_1155_address());
+                println!("name = {}", cli.name().await?);
+                println!("latestTokenId = {}", cli.latest_token_id().await?);
+                println!("totalSupply = {:?}", cli.total_supply().await?);
+                println!("totalOwned = {:?}", cli.total_owned().await?);
+                println!("------------------------------------------------------------");
+                Ok(())
+            }
+        },
+        Command::Deploy => match args.contract {
+            Contract::Nft721 => {
+                let cli = impl_rust_web3::nft_721::client::Client::new(network);
+                cli.deploy().await.map_err(Error::from)
+            }
+            Contract::Nft1155 => {
+                let cli = impl_rust_web3::nft_1155::client::Client::new(network);
+                cli.deploy().await.map_err(Error::from)
+            }
         },
     }
 }
