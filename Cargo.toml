@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "prelude",
+    "impl_rust_web3",
+    "ipfs",
+    "cli",
+]
+
